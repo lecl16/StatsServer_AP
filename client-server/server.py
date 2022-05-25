@@ -17,6 +17,10 @@ from Crypto.Cipher import AES
 # Dicionário com a informação relativa aos clientes
 users = {}
 
+# CSV file header
+header = ["client_id", "data_length", "min_value", "max_value"]
+
+
 # return the client_id of a socket or None
 
 
@@ -127,7 +131,7 @@ def create_file():
 #
 # Suporte da actualização de um ficheiro csv com a informação do cliente e resultado
 #
-def update_file(client_id, result):
+def update_file(client_id, result): #Falta um parâmetro de entrada
     return None
 # update report csv file with the result from the client
 
@@ -145,7 +149,7 @@ def number_client(client_sock, request):
 #
 # Suporte do pedido de terminação de um cliente - operação STOP
 #
-def stop_client(client_sock, request):
+def stop_client(client_sock):
     return None
 # obtain the client_id from his socket
 # verify the appropriate conditions for executing this operation
