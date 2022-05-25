@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 from email import header
-import re
 import sys
 import socket
 import select
@@ -15,7 +14,8 @@ from common_comm import send_dict, recv_dict, sendrecv_dict
 from Crypto.Cipher import AES
 
 # Dicionário com a informação relativa aos clientes
-users = {}
+users = {'client_id': [], 'data_lenght': [],
+         'min_value': [], 'max_value': [], 'cipher': []}
 
 # CSV file header
 header = ["client_id", "data_length", "min_value", "max_value"]
@@ -25,14 +25,17 @@ header = ["client_id", "data_length", "min_value", "max_value"]
 
 
 def find_client_id(client_sock):
-    return None
+    peerName = client_sock.getpeername()
+    return peerName[1]
 
 
 # Função para encriptar valores a enviar em formato json com codificação base64
 # return int data encrypted in a 16 bytes binary string and coded base64
 def encrypt_intvalue(client_id, data):
-    # INCOMPLETO
-    #
+    for i in range(0, len(users["client_id"])):
+        if users["client_id"][i] == client_id:
+            cipherkey = users["client_id"][i]
+
     cipher = AES.new(cipherkey, AES.MODE_ECB)
     data2 = cipher.encrypt(bytes("%16d" % (data), 'utf8'))
     data_tosend = str(base64.b64encode(data2), 'utf8')
@@ -42,8 +45,10 @@ def encrypt_intvalue(client_id, data):
 # Função para desencriptar valores recebidos em formato json com codificação base64
 # return int data decrypted from a 16 bytes binary string and coded base64
 def decrypt_intvalue(client_id, data):
-    # INCOMPLETO
-    #
+    for i in range(0, len(users["client_id"])):
+        if(users["client_id"][i] == client_id):
+            cipherkey = users["client_id"][i]
+
     cipher = AES.new(cipherkey, AES.MODE_ECB)
     data = base64.b64decode(data)
     data = cipher.decrypt(data)
@@ -89,18 +94,40 @@ def new_msg(client_sock):
 # Suporte da criação de um novo jogador - operação START
 #
 def new_client(client_sock, request):
-    return None
-# detect the client in the request
-# verify the appropriate conditions for executing this operation
-# process the client in the dictionary
-# return response message with or without error message
+    nome = request['client_id']
+    sock_id = find_client_id(client_sock)
+    if nome in users["client_id"]:
+        answer = {'op': "START", "status": False, "error": "Cliente existente"}
+        send_dict(client_sock, answer)
+        return False
+
+    else:
+        users["client_id"].append(nome)
+        users["data_lenght"].append()
+        users["max_value"].append()
+        users["min_value"].append()
+        users["cipher"].append(base64.b64decode(request["cipher"]))
+        answer = {"op": "START", "status": True}
+        send_dict(client_sock, answer)
+
+        return True
 
 
 #
 # Suporte da eliminação de um cliente
 #
 def clean_client(client_sock):
-    return None
+    client_id = find_client_id(client_sock)
+    print("Nº de Clientes: "+str(len(users["client_id"])))
+    for i in range(0, len(users["client_id"])):
+        print("Index: "+str(i))
+        if users["client_id"][i] == client_id:
+            users["client_id"].pop(i)
+            users["data_lenght"].pop(i)
+            users["max_value"].pop(i)
+            users["min_value"].pop(i)
+            return True
+    return False
 # obtain the client_id from his socket and delete from the dictionary
 
 
@@ -108,6 +135,16 @@ def clean_client(client_sock):
 # Suporte do pedido de desistência de um cliente - operação QUIT
 #
 def quit_client(client_sock, request):
+    if find_client_id(client_sock) in users["client_id"]:
+        answer = {"op": "QUIT", "status": True}
+        send_dict(client_sock, answer)
+        update_file(find_client_id(client_sock))
+        clean_client(client_sock)
+    else:
+        answer = {"op": "QUIT", "status": False,
+                  "error": "Cliente inexistente"}
+        send_dict(client_sock, answer)
+
     return None
 # obtain the client_id from his socket
 # verify the appropriate conditions for executing this operation
@@ -131,7 +168,14 @@ def create_file():
 #
 # Suporte da actualização de um ficheiro csv com a informação do cliente e resultado
 #
-def update_file(client_id, result): #Falta um parâmetro de entrada
+def update_file(client_id, result):  # Falta um parâmetro de entrada
+    with open('report.csv', 'a') as csv_file:
+        write = csv.DictWriter(csv_file, fieldnames=header)
+        for i in range(0, len(users["client_id"])):
+            if client_id == users["client_id"]:
+                line = {"client_id": users["client_id"][i], "data_lenght": users["data_lenght"]
+                        [i], "min_value": users["min_value"][i], "max_value": users["max_value"][i]}
+        write.writerow(line)
     return None
 # update report csv file with the result from the client
 
@@ -140,6 +184,28 @@ def update_file(client_id, result): #Falta um parâmetro de entrada
 # Suporte do processamento do número de um cliente - operação NUMBER
 #
 def number_client(client_sock, request):
+    inserted_number = decrypt_intvalue(
+        find_client_id(client_sock), request['number'])
+    if find_client_id(client_sock) in users(client_sock):
+        answer = {"op": "NUMBER", "status": True}
+        send_dict(client_sock, answer)
+        if inserted_number > -sys.maxsize-1:
+            for i in range(0, len(users["client_id"])):
+                if find_client_id(client_sock) == users["client_id"][i]:
+                    users["max_value"][i] = inserted_number
+
+        if inserted_number < sys.maxsize:
+            for i in range(0, len(users["client_id"])):
+                if find_client_id(client_sock) == users["min_value"]:
+                    users["min_value"][i] = inserted_number
+
+        for i in range(0, len(users["client_id"])):
+            if find_client_id(client_sock) == users["client_id"][i]:
+                users["data_lenght"][i] = users["data_lenght"]+1
+    else:
+        answer = {"op": "NUMBER", "status": False,
+                  "error": "Cliente inexistente"}
+        send_dict(client_sock, answer)
     return None
 # obtain the client_id from his socket
 # verify the appropriate conditions for executing this operation
@@ -150,6 +216,18 @@ def number_client(client_sock, request):
 # Suporte do pedido de terminação de um cliente - operação STOP
 #
 def stop_client(client_sock):
+    if find_client_id(client_sock) in users["client_id"]:
+        for i in range(0, len(users["client_id"])):
+            if find_client_id(client_sock) == users["client_id"][i]:
+                answer = {"op": "STOP", "status": True,
+                          "min_value": users["min_value"][i], "max_value": users["max_value"][i]}
+                send_dict(client_sock, answer)
+                update_file(client_sock,"SUCESS")
+        clean_client(client_sock)
+    else:
+        answer = {"op": "STOP", "status": False,
+                  "error": "Cliente inexistente"}
+        send_dict(client_sock, answer)
     return None
 # obtain the client_id from his socket
 # verify the appropriate conditions for executing this operation
@@ -191,7 +269,7 @@ def main():
                 # See if client sent a message
                 if len(client_sock.recv(1, socket.MSG_PEEK)) != 0:
                     # client socket has a message
-                    ##print ("server" + str (client_sock))
+                    # print ("server" + str (client_sock))
                     new_msg(client_sock)
                 else:  # Or just disconnected
                     clients.remove(client_sock)
