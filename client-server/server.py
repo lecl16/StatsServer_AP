@@ -15,7 +15,7 @@ from Crypto.Cipher import AES
 
 # Dicionário com a informação relativa aos clientes
 users = {'client_id': [], 'data_lenght': [],
-         'min_value': [], 'max_value': [], 'cipher': [],'sock_id':[]}
+         'min_value': [], 'max_value': [], 'cipher': [], 'sock_id': []}
 
 # CSV file header
 header = ["client_id", "data_length", "min_value", "max_value"]
@@ -33,6 +33,8 @@ def find_client_id(client_sock):
 
 # Função para encriptar valores a enviar em formato json com codificação base64
 # return int data encrypted in a 16 bytes binary string and coded base64
+
+
 def encrypt_intvalue(client_id, data):
     for i in range(0, len(users["client_id"])):
         if users["sock_id"][i] == client_id:
@@ -145,7 +147,7 @@ def quit_client(client_sock, request):
         answer = {"op": "QUIT", "status": False,
                   "error": "Cliente inexistente"}
         send_dict(client_sock, answer)
-    print("Users"+ str(users))
+    print("Users" + str(users))
 
     return None
 # obtain the client_id from his socket
@@ -187,9 +189,9 @@ def update_file(client_id):  # Falta um parâmetro de entrada
 #
 
 def number_client(client_sock, request):
-    inserted_number = decrypt_intvalue(
-        find_client_id(client_sock), request['number'])
-    if find_client_id(client_sock) in users(client_sock):
+    if find_client_id(client_sock) in users["sock_id"]:
+        inserted_number = decrypt_intvalue(
+            find_client_id(client_sock), request['number'])
         answer = {"op": "NUMBER", "status": True}
         send_dict(client_sock, answer)
 
@@ -250,7 +252,7 @@ def main():
     except ValueError:
         print(sys.argv[1]+" não é número inteiro")
         sys.exit(2)
-    if int(sys.argv[1])<0:
+    if int(sys.argv[1]) < 0:
         print(sys.argv[1]+" não é positivo")
         sys.exit(2)
 
