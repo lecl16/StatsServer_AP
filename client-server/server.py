@@ -15,7 +15,7 @@ from Crypto.Cipher import AES
 
 # Dicionário com a informação relativa aos clientes
 users = {'client_id': [], 'data_lenght': [],
-         'min_value': [], 'max_value': [], 'cipher': [], 'sock_id': [],'number_list':[]}
+         'min_value': [], 'max_value': [], 'cipher': [], 'sock_id': [], 'number_list': []}
 
 # CSV file header
 header = ["client_id", "data_length", "min_value", "max_value"]
@@ -121,6 +121,9 @@ def new_client(client_sock, request):
 #
 # Suporte da eliminação de um cliente
 #
+
+# PRECISA DE SER VERIFICADA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 def clean_client(client_sock):
     client_id = find_client_id(client_sock)
     print("Nº de Clientes: "+str(len(users["client_id"])))
@@ -141,6 +144,9 @@ def clean_client(client_sock):
 #
 # Suporte do pedido de desistência de um cliente - operação QUIT
 #
+
+# PRECISA DE SER VERIFICADA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 def quit_client(client_sock, request):
     if find_client_id(client_sock) in users["sock_id"]:
         answer = {"op": "QUIT", "status": True}
@@ -176,6 +182,9 @@ def create_file():
 #
 # Suporte da actualização de um ficheiro csv com a informação do cliente e resultado
 #
+
+# PRECISA DE SER VERIFICADA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 def update_file(client_id):  # Falta um parâmetro de entrada
     users["max_value"] = 69
     users["min_value"] = 0
@@ -194,6 +203,8 @@ def update_file(client_id):  # Falta um parâmetro de entrada
 # Suporte do processamento do número de um cliente - operação NUMBER
 #
 
+# PRECISA DE SER VERIFICADA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 def number_client(client_sock, request):
     if find_client_id(client_sock) in users["sock_id"]:
         inserted_number = decrypt_intvalue(
@@ -201,9 +212,9 @@ def number_client(client_sock, request):
         answer = {"op": "NUMBER", "status": True}
         send_dict(client_sock, answer)
 
-        for i in range(0, len(users["client_id"])):                     # dar append a inserted_value á lista number_list 
-            if find_client_id(client_sock) == users["client_id"][i]:    #para calcular o max e min usar a lista number_list e percorrer até users['data_lenght'][i](função stop client) 
-                users["number_list",i].append(inserted_number)
+        for i in range(0, len(users["client_id"])):
+            if find_client_id(client_sock) == users["client_id"][i]:
+                users["number_list", i].append(inserted_number)
                 users["data_lenght"][i] = users["data_lenght"]+1
 
     else:
@@ -219,7 +230,7 @@ def number_client(client_sock, request):
 #
 # Suporte do pedido de terminação de um cliente - operação STOP
 #
-def stop_client(client_sock):
+def stop_client(client_sock, request):
     if find_client_id(client_sock) in users["client_id"]:
         for i in range(0, len(users["client_id"])):
             if find_client_id(client_sock) == users["client_id"][i]:
