@@ -15,7 +15,7 @@ from Crypto.Cipher import AES
 
 # Dicionário com a informação relativa aos clientes
 users = {'client_id': [], 'data_lenght': [],
-         'min_value': [], 'max_value': [], 'cipher': []}
+         'min_value': [], 'max_value': [], 'cipher': [],'sock_id':[]}
 
 # CSV file header
 header = ["client_id", "data_length", "min_value", "max_value"]
@@ -36,7 +36,7 @@ def find_client_id(client_sock):
 # return int data encrypted in a 16 bytes binary string and coded base64
 def encrypt_intvalue(client_id, data):
     for i in range(0, len(users["client_id"])):
-        if users["client_id"][i] == client_id:
+        if users["sock_id"][i] == client_id:
             cipherkey = users["cipher"][i]
 
     cipher = AES.new(cipherkey, AES.MODE_ECB)
@@ -49,7 +49,7 @@ def encrypt_intvalue(client_id, data):
 # return int data decrypted from a 16 bytes binary string and coded base64
 def decrypt_intvalue(client_id, data):
     for i in range(0, len(users["client_id"])):
-        if(users["client_id"][i] == client_id):
+        if users["sock_id"][i] == client_id:
             cipherkey = users["cipher"][i]
 
     cipher = AES.new(cipherkey, AES.MODE_ECB)
@@ -106,7 +106,9 @@ def new_client(client_sock, request):
 
     else:
         users["client_id"].append(nome)
+        users["sock_id"].append(sock_id)
         users["cipher"].append(base64.b64decode(request["cipher"]))
+        print(users)
         answer = {"op": "START", "status": True}
         send_dict(client_sock, answer)
 
