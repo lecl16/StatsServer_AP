@@ -38,7 +38,7 @@ def validate_response(client_sock, response):
         return True
 
     except:
-        print(" ! Não foi possível validar a resposta ! ")
+        print("\nIMPOSSÍVEL VALIDAR RESPOSTA\n")
         return False
 
 
@@ -49,9 +49,10 @@ def quit_action(client_sock):
 
     if validate_response(client_sock, response):
         if response['status']:
-            print(" ! Desistência Aprovada ! ")
+            print("\nDESISTÊNCIA APROVADA\n")
         else:
-            print(" ! Desistência Recusada ! ")
+            print("\nDESISTÊNCIA NEGADA\n")
+
     # else:
     #     print(" ! Não foi possível validar a resposta ! ")
 
@@ -91,7 +92,7 @@ def run_client(client_sock, client_id):
 
         if command == "START":
 
-            userEncryptInfo = input("Pretende Encriptar os Dados ? (Y/N)")
+            userEncryptInfo = input("Encriptar Dados (Y/N) : ")
             uEI = userEncryptInfo.upper()
 
             if uEI == "Y":
@@ -117,7 +118,7 @@ def run_client(client_sock, client_id):
                 #     print(" ! Não foi possível validar a resposta ! ")
 
             else:
-                print(" ! Resposta Inválida ! ")
+                print("\nRESPOSTA INVÁLIDA\n")
                 sys.exit(1)
 
         if command == "QUIT":
@@ -129,12 +130,14 @@ def run_client(client_sock, client_id):
             # dados enviados ao servidor e (uEI == "N") representa o caso em que
             #  o cliente não pretende encriptar os dados enviados.
 
-            number = input("Valor a Adicionar (Numérico Inteiro): ")
-            number = int(number)
+            try:
+                number = int(input("Valor (numérico inteiro): "))
+            except ValueError:
+                print("\nO INPUT NÃO É DO TIPO INTEIRO\n")
 
-            while (number < 0 and type(number) != int):
-                print(" ! Valor Introduzido Inválido ! ")
-                number = input("Valor a Adicionar : ")
+            while (number < 0):
+                print("\nVALOR INVÁLIDO\n")
+                number = input("Valor (numérico inteiro): ")
 
             if (uEI == "Y"):
                 request = {'op': "NUMBER",
@@ -180,17 +183,17 @@ def main():
             defaultMachine = False
         else:
             print(
-                " ! Formato Inválido !\nDeverá ser do tipo '$python3 client.py client_id porto'")
+                "\nFORMATO INVÁLIDO\nDeverá ser do tipo '$python3 client.py client_id porto'\n")
             sys.exit(2)
 
     try:
         int(sys.argv[2])
     except ValueError:
-        print(" ! O Valor do Porto Tem de Ser Inteiro ! ")
+        print("\nVALOR DO PORTO DEVE SER INTEIRO\n")
         sys.exit(1)
 
     if int(sys.argv[2]) < 0:
-        print(" ! O Valor do Porto Tem de Ser Positivo ! ")
+        print("\nVALOR DO PORTO DEVE SER POSITIVO\n")
         sys.exit(1)
 
     if defaultMachine:
@@ -201,7 +204,8 @@ def main():
     # Verificação do número de argumentos da máquina fornecida
 
     if len(providedHostname) != 4:
-        print(" ! Formato Inválido !\nO Formato da Máquina Correto é 'X.X.X.X'")
+        print(
+            "\nFORMATO INVÁLIDO\nO formato correto para a máquina terá de ser 'X.X.X.X'\n")
         sys.exit(1)
 
     # Verificação individual dos dígitos da máquina, sendo que
@@ -212,12 +216,12 @@ def main():
             int(d)
         except ValueError:
             print(
-                " ! Valor Inválido !\nO Valor dos Dígitos Terá de Pertencer ao Intervalo [0,255]")
+                "\nVALOR INVÁLIDO\nValor dos dígitos terá de pertencer ao intervalo [0,255]\n")
             sys.exit(1)
 
         if int(d) > 255 or int(d) < 0:
             print(
-                " ! Valor Inválido !\nO Valor dos Dígitos Terá de Pertencer ao Intervalo [0,255]")
+                "\nVALOR INVÁLIDO\nValor dos dígitos terá de pertencer ao intervalo [0,255]\n")
             sys.exit(1)
 
     port = int(sys.argv[2])
