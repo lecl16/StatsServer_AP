@@ -23,6 +23,9 @@ header = ["client_id", "data_length", "min_value", "max_value"]
 
 # return the client_id of a socket or None
 
+high_number = -1
+low_number = sys.maxsize
+
 
 def find_client_id(client_sock):
     peerName = client_sock.getpeername()
@@ -141,6 +144,7 @@ def quit_client(client_sock, request):
         answer = {"op": "QUIT", "status": False,
                   "error": "Cliente inexistente"}
         send_dict(client_sock, answer)
+    print("Users"+ str(users))
 
     return None
 # obtain the client_id from his socket
@@ -165,7 +169,7 @@ def create_file():
 #
 # Suporte da actualização de um ficheiro csv com a informação do cliente e resultado
 #
-def update_file(client_id, result):  # Falta um parâmetro de entrada
+def update_file(client_id):  # Falta um parâmetro de entrada
     with open('report.csv', 'a') as csv_file:
         write = csv.DictWriter(csv_file, fieldnames=header)
         for i in range(0, len(users["client_id"])):
@@ -180,29 +184,24 @@ def update_file(client_id, result):  # Falta um parâmetro de entrada
 #
 # Suporte do processamento do número de um cliente - operação NUMBER
 #
+
 def number_client(client_sock, request):
-    high_number = -1
-    low_number = sys.maxsize
     inserted_number = decrypt_intvalue(
         find_client_id(client_sock), request['number'])
     if find_client_id(client_sock) in users(client_sock):
         answer = {"op": "NUMBER", "status": True}
         send_dict(client_sock, answer)
+
         if inserted_number > high_number:
             high_number = inserted_number
-            for i in range(0, len(users["client_id"])):
-                if find_client_id(client_sock) == users["client_id"][i]:
-                    users["max_value"][i] = inserted_number
-
         if inserted_number < low_number:
             low_number = inserted_number
             for i in range(0, len(users["client_id"])):
-                if find_client_id(client_sock) == users["min_value"]:
-                    users["min_value"][i] = inserted_number
+                if find_client_id(client_sock) == users["client_id"][i]:
+                    users["max_value"][i] = high_number
+                    users["min_value"][i] = low_number
+                    users["data_lenght"][i] = users["data_lenght"]+1
 
-        for i in range(0, len(users["client_id"])):
-            if find_client_id(client_sock) == users["client_id"][i]:
-                users["data_lenght"][i] = users["data_lenght"]+1
     else:
         answer = {"op": "NUMBER", "status": False,
                   "error": "Cliente inexistente"}
@@ -223,12 +222,13 @@ def stop_client(client_sock):
                 answer = {"op": "STOP", "status": True,
                           "min_value": users["min_value"][i], "max_value": users["max_value"][i]}
                 send_dict(client_sock, answer)
-                update_file(client_sock,"SUCESS")
+                update_file(client_sock)
         clean_client(client_sock)
     else:
         answer = {"op": "STOP", "status": False,
                   "error": "Cliente inexistente"}
         send_dict(client_sock, answer)
+    print("Users: "+str(users))
     return None
 # obtain the client_id from his socket
 # verify the appropriate conditions for executing this operation
@@ -240,8 +240,20 @@ def stop_client(client_sock):
 def main():
     # validate the number of arguments and eventually print error message and exit with error
     # verify type of of arguments and eventually print error message and exit with error
+    if len(sys.argv) != 2:
+        print("Usage: "+sys.argv[0]+" Porto")
+        sys.exit(1)
 
-    port = int(sys.argv[2])
+    try:
+        int(sys.argv[1])
+    except ValueError:
+        print(sys.argv[1]+" não é número inteiro")
+        sys.exit(2)
+    if int(sys.argv[1])<0:
+        print(sys.argv[1]+" não é positivo")
+        sys.exit(2)
+
+    port = int(sys.argv[1])
 
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind(("127.0.0.1", port))
@@ -257,7 +269,7 @@ def main():
             # Sockets may have been closed, check for that
             for client_sock in clients:
                 if client_sock.fileno() == -1:
-                    client_sock.remove(client)  # closed
+                    client_sock.remove()  # closed
             continue  # Reiterate select
 
         for client_sock in available:
