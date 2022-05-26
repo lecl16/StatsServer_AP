@@ -158,7 +158,7 @@ def quit_client(client_sock, request):
 # Suporte da criação de um ficheiro csv com o respectivo cabeçalho
 #
 def create_file():
-    if path.exists("report.csv", "w") == False:
+    if path.exists("report.csv") == False:
         with open("report.csv", "w") as csvFile:
             w = csv.DictWriter(csvFile, fieldnames=header)
             w.writeheader()

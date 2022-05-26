@@ -18,7 +18,7 @@ def numerArgs():
     assert proc.wait() == 1
     assert proc.stdout.read().decode('utf-8') == "Argumentos: client_id, Porto, DNS\n"
 
-    print("Testes funcionais(número de argumentos) efetuados com sucesso no client")
+    print("Testes funcionais(número de argumentos) efetuados com SUCESSO no client")
 
     proc = Popen("python3 server.py ", stdout=PIPE, shell=True)
     assert proc.wait() == 1
@@ -28,7 +28,7 @@ def numerArgs():
     assert proc.wait() == 1
     assert proc.stdout.read().decode('utf-8') == "Argumentos: Porto\n"
 
-    print("Testes funcionais(número de argumentos) efetuados com sucesso no server")
+    print("Testes funcionais(número de argumentos) efetuados com SUCESSO no server")
 
 
 def invalidArgs():
@@ -57,10 +57,21 @@ def invalidArgs():
     assert proc.wait() == 2
     assert proc.stdout.read().decode(
         'utf-8') == "Máquina no fromato X.X.X.X e 0 < X < 255\n"
-    
-    print("Testes funcionais(tipo de argumentos) efetuados com sucesso no client")
-    print("Testes funcionais(tipo de argumentos) efetuados com sucesso no server")
 
-print("----FUNCTIONAL TESTS----")
+    print("Testes funcionais(tipo de argumentos) efetuados com SUCESSO no client")
+
+    proc = Popen("python3 server.py -88", stdout=PIPE, shell=True)
+    assert proc.wait() == 2
+    assert proc.stdout.read().decode(
+        'utf-8') == "Porto deve ser um número inteiro positivo\n"
+
+    proc = Popen("python3 server.py mentol", stdout=PIPE, shell=True)
+    assert proc.wait() == 2
+    assert proc.stdout.read().decode('utf-8') == "Porto deve ser um numero inteiro\n"
+
+    print("Testes funcionais(tipo de argumentos) efetuados com SUCESSO no server")
+
+
+print("TESTES FUNCIONAIS")
 numerArgs()
 invalidArgs()
