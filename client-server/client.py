@@ -15,7 +15,7 @@ from Crypto.Cipher import AES
 
 def encrypt_intvalue(cipherkey, data):
     cipher = AES.new(cipherkey, AES.MODE_ECB)
-    encripted = cipher.encrypt(bytes("%16" % (data), 'utf-8'))
+    encripted = cipher.encrypt(bytes("%16d" % (data), 'utf-8'))
     data_tosend = str(base64.b64encode(encripted), "utf-8")
     return data_tosend
 
@@ -52,8 +52,8 @@ def quit_action(client_sock):
             print(" ! Desistência Aprovada ! ")
         else:
             print(" ! Desistência Recusada ! ")
-    else:
-        print(" ! Não foi possível validar a resposta ! ")
+    # else:
+    #     print(" ! Não foi possível validar a resposta ! ")
 
     # return None
 
@@ -94,10 +94,6 @@ def run_client(client_sock, client_id):
             userEncryptInfo = input("Pretende Encriptar os Dados ? (Y/N)")
             uEI = userEncryptInfo.upper()
 
-            while (uEI != "Y" or uEI != "N"):
-                userEncryptInfo = input("Pretende Encriptar os Dados ? (Y/N)")
-                uEI = userEncryptInfo.upper()
-
             if uEI == "Y":
                 request = {"op": "START", "client_id": client_id,
                            "cipher": cipherkey_tosend}
@@ -106,8 +102,8 @@ def run_client(client_sock, client_id):
                 if validate_response(client_sock, response):
                     if response['status'] == False:
                         print("Erro: " + response['error'])
-                else:
-                    print(" ! Não foi possível validar a resposta ! ")
+                # else:
+                #     print(" ! Não foi possível validar a resposta ! ")
 
             elif uEI == "N":
                 request = {"op": "START",
@@ -117,8 +113,12 @@ def run_client(client_sock, client_id):
                 if validate_response(client_sock, response):
                     if response['status'] == False:
                         print("Erro: " + response['error'])
-                else:
-                    print(" ! Não foi possível validar a resposta ! ")
+                # else:
+                #     print(" ! Não foi possível validar a resposta ! ")
+
+            else:
+                print(" ! Resposta Inválida ! ")
+                sys.exit(1)
 
         if command == "QUIT":
             quit_action(client_sock)
@@ -130,6 +130,7 @@ def run_client(client_sock, client_id):
             #  o cliente não pretende encriptar os dados enviados.
 
             number = input("Valor a Adicionar (Numérico Inteiro): ")
+            number = int(number)
 
             while (number < 0 and type(number) != int):
                 print(" ! Valor Introduzido Inválido ! ")
@@ -146,8 +147,8 @@ def run_client(client_sock, client_id):
             if validate_response(client_sock, response):
                 if response['status'] == False:
                     print("Erro: " + response['error'])
-            else:
-                print(" ! Não foi possível validar a resposta ! ")
+            # else:
+            #     print(" ! Não foi possível validar a resposta ! ")
 
         if command == "STOP":
             request = {'op': "STOP"}
@@ -157,10 +158,9 @@ def run_client(client_sock, client_id):
                 running = False
                 continue
 
-            else:
-                print(" ! Não foi possível validar a resposta ! ")
+            # else:
+            #     print(" ! Não foi possível validar a resposta ! ")
 
-    return None
 
 # Verificação dos argumentos passados na linha de comandos.
 # Variável defaultMachine é True se o utilizador apenas passar

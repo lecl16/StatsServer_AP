@@ -37,7 +37,7 @@ def find_client_id(client_sock):
 def encrypt_intvalue(client_id, data):
     for i in range(0, len(users["client_id"])):
         if users["client_id"][i] == client_id:
-            cipherkey = users["client_id"][i]
+            cipherkey = users["cipher"][i]
 
     cipher = AES.new(cipherkey, AES.MODE_ECB)
     data2 = cipher.encrypt(bytes("%16d" % (data), 'utf8'))
@@ -50,7 +50,7 @@ def encrypt_intvalue(client_id, data):
 def decrypt_intvalue(client_id, data):
     for i in range(0, len(users["client_id"])):
         if(users["client_id"][i] == client_id):
-            cipherkey = users["client_id"][i]
+            cipherkey = users["cipher"][i]
 
     cipher = AES.new(cipherkey, AES.MODE_ECB)
     data = base64.b64decode(data)
