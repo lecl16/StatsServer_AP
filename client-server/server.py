@@ -31,7 +31,6 @@ def find_client_id(client_sock):
     peerName = client_sock.getpeername()
     return peerName[1]
 
-
 # Função para encriptar valores a enviar em formato json com codificação base64
 # return int data encrypted in a 16 bytes binary string and coded base64
 def encrypt_intvalue(client_id, data):
