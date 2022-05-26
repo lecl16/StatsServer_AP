@@ -15,7 +15,7 @@ from Crypto.Cipher import AES
 
 # Dicionário com a informação relativa aos clientes
 users = {'client_id': [], 'data_lenght': [],
-         'min_value': [], 'max_value': [], 'cipher': [], 'sock_id': []}
+         'min_value': [], 'max_value': [], 'cipher': [], 'sock_id': [],'number_list':[]}
 
 # CSV file header
 header = ["client_id", "data_length", "min_value", "max_value"]
@@ -98,6 +98,7 @@ def new_msg(client_sock):
 # Suporte da criação de um novo jogador - operação START
 #
 def new_client(client_sock, request):
+    numbers_list = []
     nome = request['client_id']
     sock_id = find_client_id(client_sock)
     if nome in users["client_id"]:
@@ -108,6 +109,7 @@ def new_client(client_sock, request):
     else:
         users["client_id"].append(nome)
         users["sock_id"].append(sock_id)
+        users["number_list"].append(numbers_list)
         users["cipher"].append(base64.b64decode(request["cipher"]))
         print(users)
         answer = {"op": "START", "status": True}
@@ -129,6 +131,8 @@ def clean_client(client_sock):
             users["data_lenght"].pop(i)
             users["max_value"].pop(i)
             users["min_value"].pop(i)
+            users["sock_id"].pop(i)
+            users["number_list"].pop(i)
             return True
     return False
 # obtain the client_id from his socket and delete from the dictionary
@@ -173,10 +177,12 @@ def create_file():
 # Suporte da actualização de um ficheiro csv com a informação do cliente e resultado
 #
 def update_file(client_id):  # Falta um parâmetro de entrada
+    users["max_value"] = 69
+    users["min_value"] = 0
     with open('report.csv', 'a') as csv_file:
         write = csv.DictWriter(csv_file, fieldnames=header)
         for i in range(0, len(users["client_id"])):
-            if client_id == users["client_id"]:
+            if client_id == users["sock_id"]:
                 line = {"client_id": users["client_id"][i], "data_lenght": users["data_lenght"]
                         [i], "min_value": users["min_value"][i], "max_value": users["max_value"][i]}
         write.writerow(line)
@@ -195,15 +201,10 @@ def number_client(client_sock, request):
         answer = {"op": "NUMBER", "status": True}
         send_dict(client_sock, answer)
 
-        if inserted_number > high_number:
-            high_number = inserted_number
-        if inserted_number < low_number:
-            low_number = inserted_number
-            for i in range(0, len(users["client_id"])):
-                if find_client_id(client_sock) == users["client_id"][i]:
-                    users["max_value"][i] = high_number
-                    users["min_value"][i] = low_number
-                    users["data_lenght"][i] = users["data_lenght"]+1
+        for i in range(0, len(users["client_id"])):                     # dar append a inserted_value á lista number_list 
+            if find_client_id(client_sock) == users["client_id"][i]:    #para calcular o max e min usar a lista number_list e percorrer até users['data_lenght'][i](função stop client) 
+                users["number_list",i].append(inserted_number)
+                users["data_lenght"][i] = users["data_lenght"]+1
 
     else:
         answer = {"op": "NUMBER", "status": False,
