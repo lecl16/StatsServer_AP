@@ -85,6 +85,8 @@ def run_client(client_sock, client_id):
 
     running = True
 
+    userDataEncrypt = False
+
     while running:
 
         userCommand = input("Operação : ")
@@ -96,6 +98,7 @@ def run_client(client_sock, client_id):
             uEI = userEncryptInfo.upper()
 
             if uEI == "Y":
+                userDataEncrypt = True
                 request = {"op": "START", "client_id": client_id,
                            "cipher": cipherkey_tosend}
                 response = sendrecv_dict(client_sock, request)
@@ -126,21 +129,36 @@ def run_client(client_sock, client_id):
             # dados enviados ao servidor e (uEI == "N") representa o caso em que
             #  o cliente não pretende encriptar os dados enviados.
 
-            try:
-                number = int(input("Valor (numérico inteiro): "))
-            except ValueError:
-                print("\nO INPUT NÃO É DO TIPO INTEIRO\n")
-                sys.argv(1)
+            validNum = False
+            intNum = False
+            num = ""
 
-            while (number < 0):
-                print("\nVALOR INVÁLIDO\n")
+            while intNum != True or validNum != True:
+                validNum = False
+                intNum = False
+
                 number = input("Valor (numérico inteiro): ")
 
-            if (uEI == "Y"):
+                try:
+                    num = int(number)
+                    intNum = True
+                except:
+                    print("\nTIPO DE VALOR INÁLIDO\n")
+                    continue
+
+                num = int(number)
+
+                if num >= 0:
+                    validNum = True
+                else:
+                    print("\nVALOR INVÁLIDO\n")
+                    continue
+
+            if (userDataEncrypt):
                 request = {'op': "NUMBER",
-                           "number": encrypt_intvalue(cipherkey, number)}
+                           "number": encrypt_intvalue(cipherkey, num)}
             else:
-                request = {'op': "NUMBER", "number": number}
+                request = {'op': "NUMBER", "number": num}
 
             response = sendrecv_dict(client_sock, request)
 
