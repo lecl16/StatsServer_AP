@@ -103,9 +103,6 @@ def new_client(client_sock, request):
 
     else:
         users["client_id"].append(nome)
-        users["data_lenght"].append()
-        users["max_value"].append()
-        users["min_value"].append()
         users["cipher"].append(base64.b64decode(request["cipher"]))
         answer = {"op": "START", "status": True}
         send_dict(client_sock, answer)
@@ -184,17 +181,21 @@ def update_file(client_id, result):  # Falta um parâmetro de entrada
 # Suporte do processamento do número de um cliente - operação NUMBER
 #
 def number_client(client_sock, request):
+    high_number = -1
+    low_number = sys.maxsize
     inserted_number = decrypt_intvalue(
         find_client_id(client_sock), request['number'])
     if find_client_id(client_sock) in users(client_sock):
         answer = {"op": "NUMBER", "status": True}
         send_dict(client_sock, answer)
-        if inserted_number > -sys.maxsize-1:
+        if inserted_number > high_number:
+            high_number = inserted_number
             for i in range(0, len(users["client_id"])):
                 if find_client_id(client_sock) == users["client_id"][i]:
                     users["max_value"][i] = inserted_number
 
-        if inserted_number < sys.maxsize:
+        if inserted_number < low_number:
+            low_number = inserted_number
             for i in range(0, len(users["client_id"])):
                 if find_client_id(client_sock) == users["min_value"]:
                     users["min_value"][i] = inserted_number
