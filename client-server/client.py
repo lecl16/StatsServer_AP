@@ -168,7 +168,7 @@ def run_client(client_sock, client_id):
 
         if command == "STOP":
             request = {'op': "STOP"}
-            response = sendrecv_dict(client_sock, request)
+            response = sendrecv_dict(client_sock)
 
             if validate_response(client_sock, response):
                 running = False
