@@ -142,7 +142,7 @@ def clean_client(client_sock):
 # Suporte do pedido de desistência de um cliente - operação QUIT
 #
 def quit_client(client_sock, request):
-    if find_client_id(client_sock) in users["client_id"]:
+    if find_client_id(client_sock) in users["sock_id"]:
         answer = {"op": "QUIT", "status": True}
         send_dict(client_sock, answer)
         update_file(find_client_id(client_sock))
