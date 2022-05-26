@@ -5,11 +5,6 @@ import sys
 import socket
 import json
 import base64
-from telnetlib import SEND_URL
-from urllib import response
-
-from numpy import true_divide
-from requests import request
 from common_comm import send_dict, recv_dict, sendrecv_dict
 
 from Crypto.Cipher import AES
@@ -82,6 +77,7 @@ def quit_action(client_sock):
 
 cipherkey = os.urandom(16)
 cipherkey_tosend = str(base64.b64encode(cipherkey), "utf8")
+cipher = AES.new(cipherkey, AES.MODE_ECB)
 
 
 def run_client(client_sock, client_id):
@@ -166,15 +162,70 @@ def run_client(client_sock, client_id):
 
     return None
 
+# Verificação dos argumentos passados na linha de comandos.
+# Variável defaultMachine é True se o utilizador apenas passar
+# 2 argumentos e a máquina utilizada será a local '127.0.0.1';
+# caso contrário, a variável assumirá o valor False e o máquina
+# a utilizar será a indicada pelo utilizador.
+
 
 def main():
     # validate the number of arguments and eventually print error message and exit with error
     # verify type of arguments and eventually print error message and exit with error
 
-    cipher = AES.new(cipherkey, AES.MODE_ECB)
+    defaultMachine = True
 
-    port = ?
-    hostname = ?
+    if len(sys.argv) != 3:
+        if len(sys.argv) == 4:
+            defaultMachine = False
+        else:
+            print(
+                " ! Formato Inválido !\nDeverá ser do tipo '$python3 client.py client_id porto'")
+            sys.exit(2)
+
+    try:
+        int(sys.argv[2])
+    except ValueError:
+        print(" ! O Valor do Porto Tem de Ser Inteiro ! ")
+        sys.exit(1)
+
+    if int(sys.argv[2]) < 0:
+        print(" ! O Valor do Porto Tem de Ser Positivo ! ")
+        sys.exit(1)
+
+    if defaultMachine:
+        providedHostname = '127.0.0.1'.split('.')
+    else:
+        providedHostname = sys.argv[3].split('.')
+
+    # Verificação do número de argumentos da máquina fornecida
+
+    if len(providedHostname) != 4:
+        print(" ! Formato Inválido !\nO Formato da Máquina Correto é 'X.X.X.X'")
+        sys.exit(1)
+
+    # Verificação individual dos dígitos da máquina, sendo que
+    # cada um terá de estar no intervalo [0,255].
+
+    for d in providedHostname:
+        try:
+            int(d)
+        except ValueError:
+            print(
+                " ! Valor Inválido !\nO Valor dos Dígitos Terá de Pertencer ao Intervalo [0,255]")
+            sys.exit(1)
+
+        if int(d) > 255 or int(d) < 0:
+            print(
+                " ! Valor Inválido !\nO Valor dos Dígitos Terá de Pertencer ao Intervalo [0,255]")
+            sys.exit(1)
+
+    port = int(sys.argv[2])
+
+    if defaultMachine:
+        hostname = '127.0.0.1'
+    else:
+        hostname = sys.argv[3]
 
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_sock.connect((hostname, port))
