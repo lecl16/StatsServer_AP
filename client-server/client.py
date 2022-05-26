@@ -103,8 +103,6 @@ def run_client(client_sock, client_id):
                 if validate_response(client_sock, response):
                     if response['status'] == False:
                         print("Erro: " + response['error'])
-                # else:
-                #     print(" ! Não foi possível validar a resposta ! ")
 
             elif uEI == "N":
                 request = {"op": "START",
@@ -114,8 +112,6 @@ def run_client(client_sock, client_id):
                 if validate_response(client_sock, response):
                     if response['status'] == False:
                         print("Erro: " + response['error'])
-                # else:
-                #     print(" ! Não foi possível validar a resposta ! ")
 
             else:
                 print("\nRESPOSTA INVÁLIDA\n")
@@ -134,6 +130,7 @@ def run_client(client_sock, client_id):
                 number = int(input("Valor (numérico inteiro): "))
             except ValueError:
                 print("\nO INPUT NÃO É DO TIPO INTEIRO\n")
+                sys.argv(1)
 
             while (number < 0):
                 print("\nVALOR INVÁLIDO\n")
@@ -150,8 +147,6 @@ def run_client(client_sock, client_id):
             if validate_response(client_sock, response):
                 if response['status'] == False:
                     print("Erro: " + response['error'])
-            # else:
-            #     print(" ! Não foi possível validar a resposta ! ")
 
         if command == "STOP":
             request = {'op': "STOP"}
@@ -160,9 +155,6 @@ def run_client(client_sock, client_id):
             if validate_response(client_sock, response):
                 running = False
                 continue
-
-            # else:
-            #     print(" ! Não foi possível validar a resposta ! ")
 
 
 # Verificação dos argumentos passados na linha de comandos.
