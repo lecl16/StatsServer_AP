@@ -53,11 +53,6 @@ def quit_action(client_sock):
         else:
             print("\nDESISTÊNCIA NEGADA\n")
 
-    # else:
-    #     print(" ! Não foi possível validar a resposta ! ")
-
-    # return None
-
 
 # Outcomming message structure:
 # { op = "START", client_id, [cipher] }
@@ -85,7 +80,8 @@ def run_client(client_sock, client_id):
 
     running = True
 
-    userDataEncrypt = False
+    # userDataEncrypt = False
+    userDataEncrypt = True
 
     while running:
 
@@ -94,22 +90,31 @@ def run_client(client_sock, client_id):
 
         if command == "START":
 
-            userEncryptInfo = input("Encriptar Dados (Y/N) : ")
-            uEI = userEncryptInfo.upper()
+            # userEncryptInfo = input("Encriptar Dados (Y/N) : ")
+            # uEI = userEncryptInfo.upper()
 
-            if uEI == "Y":
-                userDataEncrypt = True
+            # if uEI == "Y":
+            #     userDataEncrypt = True
+            #     request = {"op": "START", "client_id": client_id,
+            #                "cipher": cipherkey_tosend}
+            #     response = sendrecv_dict(client_sock, request)
+
+            #     if validate_response(client_sock, response):
+            #         if response['status'] == False:
+            #             print("Erro: " + response['error'])
+
+            # elif uEI == "N":
+            #     request = {"op": "START",
+            #                "client_id": client_id, "cipher": None}
+            #     response = sendrecv_dict(client_sock, request)
+
+            #     if validate_response(client_sock, response):
+            #         if response['status'] == False:
+            #             print("Erro: " + response['error'])
+
+            if (userDataEncrypt):
                 request = {"op": "START", "client_id": client_id,
                            "cipher": cipherkey_tosend}
-                response = sendrecv_dict(client_sock, request)
-
-                if validate_response(client_sock, response):
-                    if response['status'] == False:
-                        print("Erro: " + response['error'])
-
-            elif uEI == "N":
-                request = {"op": "START",
-                           "client_id": client_id, "cipher": None}
                 response = sendrecv_dict(client_sock, request)
 
                 if validate_response(client_sock, response):
@@ -154,11 +159,14 @@ def run_client(client_sock, client_id):
                     print("\nVALOR INVÁLIDO\n")
                     continue
 
-            if (userDataEncrypt):
-                request = {'op': "NUMBER",
-                           "number": encrypt_intvalue(cipherkey, num)}
-            else:
-                request = {'op': "NUMBER", "number": num}
+            # if (userDataEncrypt):
+            #     request = {'op': "NUMBER",
+            #                "number": encrypt_intvalue(cipherkey, num)}
+            # else:
+                # request = {'op': "NUMBER", "number": num}
+
+            request = {'op': "NUMBER",
+                       "number": encrypt_intvalue(cipherkey, num)}
 
             response = sendrecv_dict(client_sock, request)
 
