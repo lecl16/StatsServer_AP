@@ -15,7 +15,7 @@ from Crypto.Cipher import AES
 
 # Dicionário com a informação relativa aos clientes
 users = {'client_id': [], 'data_lenght': [],
-         'min_value': [], 'max_value': [], 'cipher': [], 'sock_id': [], 'number_list': []}
+         'min_value': [], 'max_value': [], 'cipher': [], 'sock_id': []}
 
 # CSV file header
 header = ["client_id", "data_length", "min_value", "max_value"]
@@ -196,7 +196,8 @@ def update_file(client_id):  # Falta um parâmetro de entrada
 
 # PRECISA DE SER VERIFICADA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-
+max_value = 9999
+min_value = -1
 def number_client(client_sock, request):
     if find_client_id(client_sock) in users["sock_id"]:
         inserted_number = decrypt_intvalue(
@@ -206,8 +207,7 @@ def number_client(client_sock, request):
 
         for i in range(0, len(users["client_id"])):
             if find_client_id(client_sock) == users["client_id"][i]:
-                users.setdefault["number_list", i].append(inserted_number)
-                users["data_lenght"][i] = users["data_lenght"][i]+1
+                users["number_list",i].append(inserted_number)
 
     else:
         answer = {"op": "NUMBER", "status": False,
@@ -226,8 +226,8 @@ def stop_client(client_sock, request):
     if find_client_id(client_sock) in users["client_id"]:
         for i in range(0, len(users["client_id"])):
             if find_client_id(client_sock) == users["client_id"][i]:
-                answer = {"op": "STOP", "status": True,
-                          "min_value": users["min_value"][i], "max_value": users["max_value"][i], "client_id": users["client_id"][i]}
+                answer = {"op": "STOP", "status": True,"min":users["min_value"][i],"max":users["max_value"][i]}
+                users["data_lenght"][i] = decrypt_intvalue(users["sock_id"][i],request['data_lenght'])
                 send_dict(client_sock, answer)
                 update_file(client_sock)
         clean_client(client_sock)
