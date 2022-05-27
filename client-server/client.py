@@ -127,6 +127,7 @@ def run_client(client_sock, client_id):
 
         if command == "QUIT":
             quit_action(client_sock)
+            running = False
 
         if command == "NUMBER":
 
