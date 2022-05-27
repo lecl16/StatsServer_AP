@@ -105,7 +105,8 @@ def new_client(client_sock, request):
     else:
         users["client_id"].append(nome)
         users["sock_id"].append(sock_id)
-        users["number_list"].append(numbers_list)
+        users["data_lenght"].append(0)
+        users["number_list"] += numbers_list
         users["cipher"].append(base64.b64decode(request["cipher"]))
         print(users)
         answer = {"op": "START", "status": True}
@@ -138,6 +139,7 @@ def clean_client(client_sock):
 #
 # Suporte do pedido de desistência de um cliente - operação QUIT
 #
+
 
 def quit_client(client_sock, request):
     if find_client_id(client_sock) in users["sock_id"]:
@@ -178,24 +180,24 @@ def create_file():
 # PRECISA DE SER VERIFICADA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 def update_file(client_id):  # Falta um parâmetro de entrada
-    users["max_value"] = 69
+    users["max_value"] = 1
     users["min_value"] = 0
     with open('report.csv', 'a') as csv_file:
         write = csv.DictWriter(csv_file, fieldnames=header)
         for i in range(0, len(users["client_id"])):
-            if client_id == users["sock_id"]:
+            if client_id == users["sock_id"][i]:
                 line = {"client_id": users["client_id"][i], "data_lenght": users["data_lenght"]
-                        [i], "min_value": users["min_value"][i], "max_value": users["max_value"][i]}
+                        [i], "min_value": min(users["min_value"][i]), "max_value": max(users["max_value"][i]), "client_id": users["client_id"][i]}
         write.writerow(line)
     return None
 # update report csv file with the result from the client
-
 
 #
 # Suporte do processamento do número de um cliente - operação NUMBER
 #
 
 # PRECISA DE SER VERIFICADA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 
 def number_client(client_sock, request):
     if find_client_id(client_sock) in users["sock_id"]:
@@ -206,8 +208,8 @@ def number_client(client_sock, request):
 
         for i in range(0, len(users["client_id"])):
             if find_client_id(client_sock) == users["client_id"][i]:
-                users["number_list", i].append(inserted_number)
-                users["data_lenght"][i] = users["data_lenght"]+1
+                users.setdefault["number_list", i].append(inserted_number)
+                users["data_lenght"][i] = users["data_lenght"][i]+1
 
     else:
         answer = {"op": "NUMBER", "status": False,
