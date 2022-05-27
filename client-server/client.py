@@ -77,7 +77,7 @@ cipher = AES.new(cipherkey, AES.MODE_ECB)
 
 
 def run_client(client_sock, client_id):
-
+    data_lenght = 0
     running = True
 
     # userDataEncrypt = False
@@ -172,18 +172,19 @@ def run_client(client_sock, client_id):
             response = sendrecv_dict(client_sock, request)
 
             if validate_response(client_sock, response):
-                if response['status'] == False:
+                if response['status']:
+                    data_lenght += 1
+                else:
                     print("Erro: " + response['error'])
 
         if command == "STOP":
-            request = {'op': "STOP"}
+            request = {'op': "STOP",'data_lenght':encrypt_intvalue(cipherkey,data_lenght)}
             response = sendrecv_dict(client_sock, request)
 
             if validate_response(client_sock, response):
-                # if client_id == response['client_id']:
-                print(response['number_list'])
-                print(response['max_value'])
-                print(response['min_value'])
+                if response["status"]:
+                    print(response['max'])
+                    print(response['min'])
 
                 running = False
                 continue
