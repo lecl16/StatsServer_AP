@@ -180,14 +180,12 @@ def create_file():
 # PRECISA DE SER VERIFICADA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 def update_file(client_id):  # Falta um parâmetro de entrada
-    users["max_value"] = 1
-    users["min_value"] = 0
     with open('report.csv', 'a') as csv_file:
         write = csv.DictWriter(csv_file, fieldnames=header)
         for i in range(0, len(users["client_id"])):
             if client_id == users["sock_id"][i]:
                 line = {"client_id": users["client_id"][i], "data_lenght": users["data_lenght"]
-                        [i], "min_value": min(users["min_value"][i]), "max_value": max(users["max_value"][i]), "client_id": users["client_id"][i]}
+                        [i], "min_value": min(users["min_value"][i]), "max_value": max(users["max_value"][i])}
         write.writerow(line)
     return None
 # update report csv file with the result from the client
@@ -229,7 +227,7 @@ def stop_client(client_sock, request):
         for i in range(0, len(users["client_id"])):
             if find_client_id(client_sock) == users["client_id"][i]:
                 answer = {"op": "STOP", "status": True,
-                          "min_value": users["min_value"][i], "max_value": users["max_value"][i]}
+                          "min_value": users["min_value"][i], "max_value": users["max_value"][i], "client_id": users["client_id"][i]}
                 send_dict(client_sock, answer)
                 update_file(client_sock)
         clean_client(client_sock)
