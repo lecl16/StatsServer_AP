@@ -23,10 +23,6 @@ header = ["client_id", "data_length", "min_value", "max_value"]
 
 # return the client_id of a socket or None
 
-high_number = -1
-low_number = sys.maxsize
-
-
 def find_client_id(client_sock):
     peerName = client_sock.getpeername()
     return peerName[1]
@@ -122,8 +118,6 @@ def new_client(client_sock, request):
 # Suporte da eliminação de um cliente
 #
 
-# PRECISA DE SER VERIFICADA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 def clean_client(client_sock):
     client_id = find_client_id(client_sock)
     print("Nº de Clientes: "+str(len(users["client_id"])))
@@ -131,6 +125,7 @@ def clean_client(client_sock):
         print("Index: "+str(i))
         if users["client_id"][i] == client_id:
             users["client_id"].pop(i)
+            users["cipher"].pop(i)
             users["data_lenght"].pop(i)
             users["max_value"].pop(i)
             users["min_value"].pop(i)
@@ -140,12 +135,9 @@ def clean_client(client_sock):
     return False
 # obtain the client_id from his socket and delete from the dictionary
 
-
 #
 # Suporte do pedido de desistência de um cliente - operação QUIT
 #
-
-# PRECISA DE SER VERIFICADA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 def quit_client(client_sock, request):
     if find_client_id(client_sock) in users["sock_id"]:
