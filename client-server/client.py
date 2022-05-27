@@ -180,11 +180,10 @@ def run_client(client_sock, client_id):
             response = sendrecv_dict(client_sock, request)
 
             if validate_response(client_sock, response):
-                for i in range(0, len(response['client_id'])):
-                    if client_id == response['client_id'][i]:
-                        print(response['number_list'][i])
-                        print(response['max_value'][i])
-                        print(response['min_value'][i])
+                # if client_id == response['client_id']:
+                print(response['number_list'])
+                print(response['max_value'])
+                print(response['min_value'])
 
                 running = False
                 continue
