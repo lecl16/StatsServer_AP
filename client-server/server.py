@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 from email import header
+from re import I
 import sys
 import socket
 import select
@@ -14,18 +15,13 @@ from common_comm import send_dict, recv_dict, sendrecv_dict
 from Crypto.Cipher import AES
 
 # Dicionário com a informação relativa aos clientes
-users = {'client_id': [], 'data_lenght': [],
-         'min_value': [], 'max_value': [], 'cipher': [], 'sock_id': [], 'number_list': []}
+users = {'client_id': [], 'data_length': [],
+         'min_value': [], 'max_value': [], 'cipher': [], 'sock_id': [],'number_list':[]}
 
 # CSV file header
 header = ["client_id", "data_length", "min_value", "max_value"]
 
-
 # return the client_id of a socket or None
-
-high_number = -1
-low_number = sys.maxsize
-
 
 def find_client_id(client_sock):
     peerName = client_sock.getpeername()
@@ -98,7 +94,6 @@ def new_msg(client_sock):
 # Suporte da criação de um novo jogador - operação START
 #
 def new_client(client_sock, request):
-    numbers_list = []
     nome = request['client_id']
     sock_id = find_client_id(client_sock)
     if nome in users["client_id"]:
@@ -109,7 +104,10 @@ def new_client(client_sock, request):
     else:
         users["client_id"].append(nome)
         users["sock_id"].append(sock_id)
-        users["number_list"].append(numbers_list)
+        users["number_list"].append([])
+        users["min_value"].append(0)
+        users["max_value"].append(0)
+        users["data_length"].append(0)
         users["cipher"].append(base64.b64decode(request["cipher"]))
         print(users)
         answer = {"op": "START", "status": True}
@@ -122,16 +120,15 @@ def new_client(client_sock, request):
 # Suporte da eliminação de um cliente
 #
 
-# PRECISA DE SER VERIFICADA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 def clean_client(client_sock):
     client_id = find_client_id(client_sock)
     print("Nº de Clientes: "+str(len(users["client_id"])))
     for i in range(0, len(users["client_id"])):
         print("Index: "+str(i))
-        if users["client_id"][i] == client_id:
+        if users["sock_id"][i] == client_id:
             users["client_id"].pop(i)
-            users["data_lenght"].pop(i)
+            users["cipher"].pop(i)
+            users["data_length"].pop(i)
             users["max_value"].pop(i)
             users["min_value"].pop(i)
             users["sock_id"].pop(i)
@@ -140,12 +137,10 @@ def clean_client(client_sock):
     return False
 # obtain the client_id from his socket and delete from the dictionary
 
-
 #
 # Suporte do pedido de desistência de um cliente - operação QUIT
 #
 
-# PRECISA DE SER VERIFICADA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 def quit_client(client_sock, request):
     if find_client_id(client_sock) in users["sock_id"]:
@@ -186,18 +181,14 @@ def create_file():
 # PRECISA DE SER VERIFICADA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 def update_file(client_id):  # Falta um parâmetro de entrada
-    users["max_value"] = 69
-    users["min_value"] = 0
     with open('report.csv', 'a') as csv_file:
         write = csv.DictWriter(csv_file, fieldnames=header)
         for i in range(0, len(users["client_id"])):
-            if client_id == users["sock_id"]:
-                line = {"client_id": users["client_id"][i], "data_lenght": users["data_lenght"]
-                        [i], "min_value": users["min_value"][i], "max_value": users["max_value"][i]}
+            if find_client_id(client_id) == users["sock_id"][i]:
+                line = {"client_id": users["client_id"][i], "data_length": users["data_length"][i], "min_value":users["min_value"][i], "max_value": users["max_value"][i]}
         write.writerow(line)
     return None
 # update report csv file with the result from the client
-
 
 #
 # Suporte do processamento do número de um cliente - operação NUMBER
@@ -213,10 +204,11 @@ def number_client(client_sock, request):
         send_dict(client_sock, answer)
 
         for i in range(0, len(users["client_id"])):
-            if find_client_id(client_sock) == users["client_id"][i]:
-                users["number_list", i].append(inserted_number)
-                users["data_lenght"][i] = users["data_lenght"]+1
+            if find_client_id(client_sock) == users["sock_id"][i]:
+                users["number_list"][i].append(inserted_number)
 
+                # TODO remove later
+                # users["data_length"][i]
     else:
         answer = {"op": "NUMBER", "status": False,
                   "error": "Cliente inexistente"}
@@ -231,19 +223,22 @@ def number_client(client_sock, request):
 # Suporte do pedido de terminação de um cliente - operação STOP
 #
 def stop_client(client_sock, request):
-    if find_client_id(client_sock) in users["client_id"]:
-        for i in range(0, len(users["client_id"])):
-            if find_client_id(client_sock) == users["client_id"][i]:
-                answer = {"op": "STOP", "status": True,
-                          "min_value": users["min_value"][i], "max_value": users["max_value"][i]}
+    if find_client_id(client_sock) in users["sock_id"]:
+        for i in range(0, len(users["client_id"])): 
+            if find_client_id(client_sock) == users["sock_id"][i]:
+                users["max_value"][i] = max(users["number_list"][i])
+                users["min_value"][i] = min(users["number_list"][i])
+                users["data_length"][i] = len(users["number_list"][i])
+                answer = {"op": "STOP", "status": True,"min":users["min_value"][i],"max":users["max_value"][i]}
                 send_dict(client_sock, answer)
                 update_file(client_sock)
+
+        print("Users: "+str(users))
         clean_client(client_sock)
     else:
         answer = {"op": "STOP", "status": False,
                   "error": "Cliente inexistente"}
         send_dict(client_sock, answer)
-    print("Users: "+str(users))
     return None
 # obtain the client_id from his socket
 # verify the appropriate conditions for executing this operation

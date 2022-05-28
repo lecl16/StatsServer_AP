@@ -77,7 +77,7 @@ cipher = AES.new(cipherkey, AES.MODE_ECB)
 
 
 def run_client(client_sock, client_id):
-
+    data_lenght = 0
     running = True
 
     # userDataEncrypt = False
@@ -89,28 +89,6 @@ def run_client(client_sock, client_id):
         command = userCommand.upper()
 
         if command == "START":
-
-            # userEncryptInfo = input("Encriptar Dados (Y/N) : ")
-            # uEI = userEncryptInfo.upper()
-
-            # if uEI == "Y":
-            #     userDataEncrypt = True
-            #     request = {"op": "START", "client_id": client_id,
-            #                "cipher": cipherkey_tosend}
-            #     response = sendrecv_dict(client_sock, request)
-
-            #     if validate_response(client_sock, response):
-            #         if response['status'] == False:
-            #             print("Erro: " + response['error'])
-
-            # elif uEI == "N":
-            #     request = {"op": "START",
-            #                "client_id": client_id, "cipher": None}
-            #     response = sendrecv_dict(client_sock, request)
-
-            #     if validate_response(client_sock, response):
-            #         if response['status'] == False:
-            #             print("Erro: " + response['error'])
 
             if (userDataEncrypt):
                 request = {"op": "START", "client_id": client_id,
@@ -127,12 +105,9 @@ def run_client(client_sock, client_id):
 
         if command == "QUIT":
             quit_action(client_sock)
+            running = False
 
         if command == "NUMBER":
-
-            # (uEI == "Y") indica o caso em que o cliente pretende encriptar os
-            # dados enviados ao servidor e (uEI == "N") representa o caso em que
-            #  o cliente não pretende encriptar os dados enviados.
 
             validNum = False
             intNum = False
@@ -159,19 +134,13 @@ def run_client(client_sock, client_id):
                     print("\nVALOR INVÁLIDO\n")
                     continue
 
-            # if (userDataEncrypt):
-            #     request = {'op': "NUMBER",
-            #                "number": encrypt_intvalue(cipherkey, num)}
-            # else:
-                # request = {'op': "NUMBER", "number": num}
-
             request = {'op': "NUMBER",
                        "number": encrypt_intvalue(cipherkey, num)}
 
             response = sendrecv_dict(client_sock, request)
 
             if validate_response(client_sock, response):
-                if response['status'] == False:
+                if not response['status']:
                     print("Erro: " + response['error'])
 
         if command == "STOP":
@@ -179,8 +148,14 @@ def run_client(client_sock, client_id):
             response = sendrecv_dict(client_sock, request)
 
             if validate_response(client_sock, response):
+                if response["status"]:
+                    print(response['max'])
+                    print(response['min'])
+
                 running = False
                 continue
+            else:
+                print("\nRESPOSTA INVÁLIDA\n")
 
 
 # Verificação dos argumentos passados na linha de comandos.
