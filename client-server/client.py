@@ -149,8 +149,8 @@ def run_client(client_sock, client_id):
 
             if validate_response(client_sock, response):
                 if response["status"]:
-                    print(response['max'])
-                    print(response['min'])
+                    print("Máximo: "+str(response['max']))
+                    print("Mínimo: "+str(response['min']))
 
                 running = False
                 continue

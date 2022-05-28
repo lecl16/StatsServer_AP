@@ -1,7 +1,9 @@
 client_id,data_length,min_value,max_value
-paulo,2,123,321
-cegonha,2,12,21
-cegonha,2,123,321
-paulo,2,12,21
-paulomacedo,2,31,123
-paulo,2,12,21
+
+papagaio,4,7,98
+papagaio,0,0,0
+papagaio,4,1247,124581
+canario,3,50,321
+papagaio,2,1246,12521512
+canario,3,1,3
+papagaio,0,0,0
