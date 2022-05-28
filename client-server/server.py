@@ -196,6 +196,8 @@ def update_file(client_id):  # Falta um parâmetro de entrada
 
 # PRECISA DE SER VERIFICADA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+max_value = 9999
+min_value = -1
 def number_client(client_sock, request):
     if find_client_id(client_sock) in users["sock_id"]:
         inserted_number = decrypt_intvalue(

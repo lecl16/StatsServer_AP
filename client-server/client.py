@@ -144,7 +144,7 @@ def run_client(client_sock, client_id):
                     print("Erro: " + response['error'])
 
         if command == "STOP":
-            request = {'op': "STOP"}
+            request = {'op': "STOP",'data_lenght':encrypt_intvalue(cipherkey,data_lenght)}
             response = sendrecv_dict(client_sock, request)
 
             if validate_response(client_sock, response):
