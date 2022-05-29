@@ -7,7 +7,8 @@ from subprocess import PIPE
 def numerArgs():
     proc = Popen("python3 client.py", stdout=PIPE, shell=True)
     assert proc.wait() == 1
-    assert proc.stdout.read().decode('utf-8') == "Argumentos: client_id, Porto, DNS\n"
+    assert proc.stdout.read().decode(
+        'utf-8') == ("\nFORMATO INVÁLIDO\nDeverá ser do tipo '$python3 client.py client_id porto'\n")
 
     proc = Popen("python3 client.py client_id", stdout=PIPE, shell=True)
     assert proc.wait() == 1

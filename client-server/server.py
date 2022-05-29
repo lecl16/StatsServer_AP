@@ -179,8 +179,6 @@ def create_file():
 # Suporte da actualização de um ficheiro csv com a informação do cliente e resultado
 #
 
-# PRECISA DE SER VERIFICADA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 def update_file(client_id):  # Falta um parâmetro de entrada
     with open('report.csv', 'a') as csv_file:
         write = csv.DictWriter(csv_file, fieldnames=header)

@@ -144,7 +144,8 @@ def run_client(client_sock, client_id):
                     print("Erro: " + response['error'])
 
         if command == "STOP":
-            request = {'op': "STOP",'data_lenght':encrypt_intvalue(cipherkey,data_lenght)}
+            request = {'op': "STOP", 'data_lenght': encrypt_intvalue(
+                cipherkey, data_lenght)}
             response = sendrecv_dict(client_sock, request)
 
             if validate_response(client_sock, response):
@@ -177,7 +178,7 @@ def main():
         else:
             print(
                 "\nFORMATO INVÁLIDO\nDeverá ser do tipo '$python3 client.py client_id porto'\n")
-            sys.exit(2)
+            sys.exit(1)
 
     try:
         int(sys.argv[2])
