@@ -249,16 +249,16 @@ def main():
     # validate the number of arguments and eventually print error message and exit with error
     # verify type of of arguments and eventually print error message and exit with error
     if len(sys.argv) != 2:
-        print("Usage: "+sys.argv[0]+" Porto")
+        print("Usage: server.py Porto")
         sys.exit(1)
 
     try:
         int(sys.argv[1])
     except ValueError:
-        print(sys.argv[1]+" não é número inteiro")
+        print("Porto deve ser um número inteiro")
         sys.exit(2)
     if int(sys.argv[1]) < 0:
-        print(sys.argv[1]+" não é positivo")
+        print("Porto deve ser um número inteiro positivo")
         sys.exit(2)
 
     port = int(sys.argv[1])

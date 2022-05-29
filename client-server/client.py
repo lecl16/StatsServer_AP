@@ -177,18 +177,19 @@ def main():
             defaultMachine = False
         else:
             print(
-                "\nFORMATO INVÁLIDO\nDeverá ser do tipo '$python3 client.py client_id porto'\n")
+                "\nFORMATO INVÁLIDO\nDeverá ser do tipo '$python3 client.py client_id porto'")
             sys.exit(1)
 
     try:
         int(sys.argv[2])
     except ValueError:
-        print("\nVALOR DO PORTO DEVE SER INTEIRO\n")
-        sys.exit(1)
+        print("\nVALOR DO PORTO DEVE SER INTEIRO")
+        sys.exit(2)
 
     if int(sys.argv[2]) < 0:
-        print("\nVALOR DO PORTO DEVE SER POSITIVO\n")
-        sys.exit(1)
+        print("\nVALOR DO PORTO DEVE SER POSITIVO")
+
+        sys.exit(2)
 
     if defaultMachine:
         providedHostname = '127.0.0.1'.split('.')
@@ -200,7 +201,7 @@ def main():
     if len(providedHostname) != 4:
         print(
             "\nFORMATO INVÁLIDO\nO formato correto para a máquina terá de ser 'X.X.X.X'\n")
-        sys.exit(1)
+        sys.exit(2)
 
     # Verificação individual dos dígitos da máquina, sendo que
     # cada um terá de estar no intervalo [0,255].
@@ -211,12 +212,12 @@ def main():
         except ValueError:
             print(
                 "\nVALOR INVÁLIDO\nValor dos dígitos terá de pertencer ao intervalo [0,255]\n")
-            sys.exit(1)
+            sys.exit(2)
 
         if int(d) > 255 or int(d) < 0:
             print(
                 "\nVALOR INVÁLIDO\nValor dos dígitos terá de pertencer ao intervalo [0,255]\n")
-            sys.exit(1)
+            sys.exit(2)
 
     port = int(sys.argv[2])
 
